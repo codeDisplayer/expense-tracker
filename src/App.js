@@ -1,24 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { lazy, Suspense, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Homepage from './routes/Homepage';
+import AppBarComponent from './components/AppBarComponent';
+import LoadingPage from './routes/LoadingPage';
+
+const Dashboard = lazy(() => import('./routes/Dashboard'));
+
+const Profile = lazy(() => import('./routes/Profile'));
+const CustomCategories = lazy(() => import('./routes/CustomCategories'));
+const Error404Page = lazy(() => import('./routes/Error404Page'));
 
 function App() {
+  const [addingExpenseIsOpen, setAddingExpenseIsOpen] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <AppBarComponent setAddingExpenseIsOpen={setAddingExpenseIsOpen} />
+      <Routes>
+        <Route path="/" element={
+          <Homepage
+            addingExpenseIsOpen={addingExpenseIsOpen}
+            setAddingExpenseIsOpen={setAddingExpenseIsOpen}
+          />
+        } />
+
+        <Route path="/profile" element={
+          <Suspense fallback={<LoadingPage />}>
+            <Profile />
+          </Suspense>
+        } />
+        <Route path="/profile/custom-categories" element={
+          <Suspense fallback={<LoadingPage />}>
+             <CustomCategories />
+          </Suspense>
+        } />
+
+        <Route path="/dashboard" element={
+          <Suspense fallback={<LoadingPage />}>
+            <Dashboard />
+          </Suspense>
+        } />
+
+
+
+        <Route path="*" element={
+          <Suspense fallback={<LoadingPage />}>
+            <Error404Page />
+          </Suspense>
+        } />
+      </Routes>
+    </Router>
   );
 }
 
